@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Calendar, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { FileText, Eye } from 'lucide-react';
 
 interface CaseData {
   id: string;
@@ -12,28 +12,19 @@ interface CaseData {
   extractive_summary: string;
 }
 
-interface PaginationData {
-  current_page: number;
-  page_size: number;
-  total_items: number;
-  total_pages: number;
-  has_next: boolean;
-  has_previous: boolean;
-}
-
 interface SearchResultsProps {
   results: CaseData[];
-  pagination: PaginationData;
+  totalCases: number;
+  returnedCases: number;
   loading?: boolean;
-  onPageChange: (page: number) => void;
   searchTerm?: string;
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({
   results,
-  pagination,
+  totalCases,
+  returnedCases,
   loading = false,
-  onPageChange,
   searchTerm
 }) => {
   if (loading) {
@@ -60,11 +51,11 @@ const SearchResults: React.FC<SearchResultsProps> = ({
     return (
       <Card className="p-12 text-center shadow-card">
         <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-foreground mb-2">No cases found</h3>
-        <p className="text-muted-foreground">
+        <h3 className="text-xl font-semibold text-foreground mb-2" dir="rtl">لم يتم العثور على قضايا</h3>
+        <p className="text-muted-foreground" dir="rtl">
           {searchTerm 
-            ? `No cases found matching "${searchTerm}". Try different keywords or adjust your search criteria.`
-            : "Start by entering a search term to find legal cases."
+            ? `لم يتم العثور على قضايا تطابق "${searchTerm}". جرب كلمات مختلفة أو عدل معايير البحث.`
+            : "ابدأ بإدخال مصطلح البحث للعثور على القضايا القانونية."
           }
         </p>
       </Card>
@@ -76,14 +67,14 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       {/* Results Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Search Results</h2>
-          <p className="text-muted-foreground">
-            Found {pagination.total_items} cases {searchTerm && `for "${searchTerm}"`}
+          <h2 className="text-2xl font-bold text-foreground" dir="rtl">نتائج البحث</h2>
+          <p className="text-muted-foreground" dir="rtl">
+            تم العثور على {totalCases} قضية {searchTerm && `لـ "${searchTerm}"`}
           </p>
         </div>
         
         <Badge variant="outline" className="bg-primary-light text-primary border-primary/30">
-          Page {pagination.current_page} of {pagination.total_pages}
+          {returnedCases} من {totalCases}
         </Badge>
       </div>
 
@@ -99,13 +90,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                     <FileText className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Case #{case_item.case_id}
+                    <h3 className="text-lg font-semibold text-foreground" dir="rtl">
+                      قضية رقم #{case_item.case_id}
                     </h3>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-1" dir="rtl">
                         <FileText className="h-4 w-4" />
-                        {case_item.total_documents} documents
+                        {case_item.total_documents} وثيقة
                       </span>
                     </div>
                   </div>
@@ -113,15 +104,15 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                 
                 <Button variant="outline" size="sm">
                   <Eye className="h-4 w-4 mr-2" />
-                  View Details
+                  <span dir="rtl">عرض التفاصيل</span>
                 </Button>
               </div>
 
               {/* Abstractive Summary */}
               {case_item.abstractive_summary && (
                 <div className="bg-accent-light p-4 rounded-lg border border-accent/20">
-                  <h4 className="font-medium text-accent-foreground mb-2">Abstract Summary</h4>
-                  <p className="text-sm text-foreground leading-relaxed">
+                  <h4 className="font-medium text-accent-foreground mb-2" dir="rtl">الملخص التجريدي</h4>
+                  <p className="text-sm text-foreground leading-relaxed text-right" dir="rtl">
                     {case_item.abstractive_summary}
                   </p>
                 </div>
@@ -130,10 +121,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               {/* Extractive Summary */}
               {case_item.extractive_summary && (
                 <div className="bg-secondary/50 p-4 rounded-lg border border-border">
-                  <h4 className="font-medium text-secondary-foreground mb-2">Key Points</h4>
-                  <div className="text-sm text-foreground space-y-1">
+                  <h4 className="font-medium text-secondary-foreground mb-2" dir="rtl">النقاط الرئيسية</h4>
+                  <div className="text-sm text-foreground space-y-1" dir="rtl">
                     {case_item.extractive_summary.split('\n').filter(line => line.trim()).map((point, idx) => (
-                      <p key={idx} className="leading-relaxed">
+                      <p key={idx} className="leading-relaxed text-right">
                         {point.replace(/^\*\s*/, '• ')}
                       </p>
                     ))}
@@ -144,50 +135,6 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           </Card>
         ))}
       </div>
-
-      {/* Pagination */}
-      {pagination.total_pages > 1 && (
-        <div className="flex items-center justify-center gap-4 py-6">
-          <Button
-            variant="outline"
-            onClick={() => onPageChange(pagination.current_page - 1)}
-            disabled={!pagination.has_previous}
-            className="flex items-center gap-2"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Previous
-          </Button>
-          
-          <div className="flex items-center gap-2">
-            {Array.from({ length: Math.min(5, pagination.total_pages) }, (_, i) => {
-              const pageNum = Math.max(1, pagination.current_page - 2) + i;
-              if (pageNum > pagination.total_pages) return null;
-              
-              return (
-                <Button
-                  key={pageNum}
-                  variant={pageNum === pagination.current_page ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onPageChange(pageNum)}
-                  className="w-10"
-                >
-                  {pageNum}
-                </Button>
-              );
-            })}
-          </div>
-          
-          <Button
-            variant="outline"
-            onClick={() => onPageChange(pagination.current_page + 1)}
-            disabled={!pagination.has_next}
-            className="flex items-center gap-2"
-          >
-            Next
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

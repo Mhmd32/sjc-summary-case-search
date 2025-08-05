@@ -1,20 +1,14 @@
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-const API_BASE_URL = 'http://localhost:7072/api';
+const API_BASE_URL = 'http://localhost:7071/api';
 
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  pagination?: {
-    current_page: number;
-    page_size: number;
-    total_items: number;
-    total_pages: number;
-    has_next: boolean;
-    has_previous: boolean;
-  };
-  message: string;
+interface ApiResponse {
+  total_cases: number;
+  returned_cases: number;
+  offset: number;
+  limit: number;
+  case_summaries: CaseData[];
 }
 
 interface CaseData {
@@ -27,10 +21,8 @@ interface CaseData {
 
 interface SearchParams {
   search?: string;
-  page?: number;
-  page_size?: number;
-  start_date?: string;
-  end_date?: string;
+  offset?: number;
+  limit?: number;
 }
 
 export const useApi = () => {
@@ -40,42 +32,28 @@ export const useApi = () => {
   const handleApiError = (error: any) => {
     console.error('API Error:', error);
     toast({
-      title: "Search Error",
-      description: "Failed to fetch case data. Please check your connection and try again.",
+      title: "خطأ في البحث",
+      description: "فشل في جلب بيانات القضايا. يرجى التحقق من الاتصال والمحاولة مرة أخرى.",
       variant: "destructive",
     });
   };
 
-  const searchCases = useCallback(async (params: SearchParams): Promise<ApiResponse<CaseData[]> | null> => {
+  const searchCases = useCallback(async (params: SearchParams): Promise<ApiResponse | null> => {
     setLoading(true);
     try {
-      let url: string;
+      const searchParams = new URLSearchParams();
       
-      if (params.start_date && params.end_date) {
-        // Date range search
-        const searchParams = new URLSearchParams({
-          start_date: params.start_date,
-          end_date: params.end_date,
-          page: String(params.page || 1),
-          page_size: String(params.page_size || 20)
-        });
-        url = `${API_BASE_URL}/case-summaries/date-range?${searchParams}`;
-      } else if (params.search) {
-        // Text search
-        const searchParams = new URLSearchParams({
-          search: params.search,
-          page: String(params.page || 1),
-          page_size: String(params.page_size || 20)
-        });
-        url = `${API_BASE_URL}/case-summaries/search?${searchParams}`;
-      } else {
-        // Get all cases
-        const searchParams = new URLSearchParams({
-          page: String(params.page || 1),
-          page_size: String(params.page_size || 20)
-        });
-        url = `${API_BASE_URL}/case-summaries?${searchParams}`;
+      if (params.search) {
+        searchParams.append('search', params.search);
       }
+      if (params.offset) {
+        searchParams.append('offset', String(params.offset));
+      }
+      if (params.limit) {
+        searchParams.append('limit', String(params.limit));
+      }
+      
+      const url = `${API_BASE_URL}/case_summaries${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
 
       const response = await fetch(url, {
         method: 'GET',
@@ -88,65 +66,13 @@ export const useApi = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: ApiResponse<CaseData[]> = await response.json();
+      const data: ApiResponse = await response.json();
       
-      if (data.success) {
-        toast({
-          title: "Search completed",
-          description: `Found ${data.pagination?.total_items || 0} cases`,
-        });
-      }
-      
-      return data;
-    } catch (error) {
-      handleApiError(error);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
-
-  const getCaseById = useCallback(async (caseId: string): Promise<ApiResponse<CaseData> | null> => {
-    setLoading(true);
-    try {
-      const url = `${API_BASE_URL}/case-summaries?case_id=${encodeURIComponent(caseId)}`;
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      toast({
+        title: "تم البحث بنجاح",
+        description: `تم العثور على ${data.total_cases} قضية`,
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: ApiResponse<CaseData> = await response.json();
-      return data;
-    } catch (error) {
-      handleApiError(error);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
-
-  const getStatistics = useCallback(async (): Promise<any> => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/case-summaries/statistics`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      
       return data;
     } catch (error) {
       handleApiError(error);
@@ -159,7 +85,5 @@ export const useApi = () => {
   return {
     loading,
     searchCases,
-    getCaseById,
-    getStatistics,
   };
 };

@@ -12,74 +12,37 @@ interface CaseData {
   extractive_summary: string;
 }
 
-interface PaginationData {
-  current_page: number;
-  page_size: number;
-  total_items: number;
-  total_pages: number;
-  has_next: boolean;
-  has_previous: boolean;
-}
 
 const Index = () => {
   const [results, setResults] = useState<CaseData[]>([]);
-  const [pagination, setPagination] = useState<PaginationData>({
-    current_page: 1,
-    page_size: 20,
-    total_items: 0,
-    total_pages: 0,
-    has_next: false,
-    has_previous: false,
-  });
-  const [currentSearch, setCurrentSearch] = useState<{
-    searchTerm?: string;
-    dateRange?: { start: string; end: string };
-  }>({});
+  const [totalCases, setTotalCases] = useState(0);
+  const [returnedCases, setReturnedCases] = useState(0);
+  const [currentSearch, setCurrentSearch] = useState<string>('');
 
   const { loading, searchCases } = useApi();
 
-  const handleSearch = async (
-    searchTerm: string, 
-    dateRange?: { start: string; end: string }
-  ) => {
-    setCurrentSearch({ searchTerm, dateRange });
+  const handleSearch = async (searchTerm: string) => {
+    setCurrentSearch(searchTerm);
     
     const searchParams = {
-      search: searchTerm,
-      start_date: dateRange?.start,
-      end_date: dateRange?.end,
-      page: 1,
-      page_size: 20,
+      search: searchTerm || undefined,
+      offset: 0,
+      limit: 20,
     };
 
     const response = await searchCases(searchParams);
     
-    if (response && response.success) {
-      setResults(Array.isArray(response.data) ? response.data : [response.data]);
-      if (response.pagination) {
-        setPagination(response.pagination);
-      }
+    if (response) {
+      setResults(response.case_summaries);
+      setTotalCases(response.total_cases);
+      setReturnedCases(response.returned_cases);
     }
   };
 
-  const handlePageChange = async (page: number) => {
-    const searchParams = {
-      search: currentSearch.searchTerm,
-      start_date: currentSearch.dateRange?.start,
-      end_date: currentSearch.dateRange?.end,
-      page,
-      page_size: 20,
-    };
-
-    const response = await searchCases(searchParams);
-    
-    if (response && response.success) {
-      setResults(Array.isArray(response.data) ? response.data : [response.data]);
-      if (response.pagination) {
-        setPagination(response.pagination);
-      }
-    }
-  };
+  // Load initial data
+  React.useEffect(() => {
+    handleSearch('');
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -93,10 +56,10 @@ const Index = () => {
         
         <SearchResults
           results={results}
-          pagination={pagination}
+          totalCases={totalCases}
+          returnedCases={returnedCases}
           loading={loading}
-          onPageChange={handlePageChange}
-          searchTerm={currentSearch.searchTerm}
+          searchTerm={currentSearch}
         />
       </div>
     </div>

@@ -13,26 +13,26 @@ const SearchHeader: React.FC = () => {
         </div>
       </div>
       
-      <h1 className="text-4xl font-bold text-foreground mb-4">
-        Legal Case Search Portal
+      <h1 className="text-4xl font-bold text-foreground mb-4" dir="rtl">
+        بوابة البحث في القضايا القانونية
       </h1>
       
-      <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
-        Professional search interface for legal case summaries with advanced voice recognition capabilities
+      <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6" dir="rtl">
+        واجهة بحث مهنية لملخصات القضايا القانونية مع إمكانيات التعرف على الصوت المتقدمة
       </p>
       
       <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <Search className="h-4 w-4" />
-          <span>Advanced Search</span>
+          <span dir="rtl">بحث متقدم</span>
         </div>
         <div className="flex items-center gap-2">
           <FileText className="h-4 w-4" />
-          <span>Case Summaries</span>
+          <span dir="rtl">ملخصات القضايا</span>
         </div>
         <div className="flex items-center gap-2">
           <Scale className="h-4 w-4" />
-          <span>Legal Documentation</span>
+          <span dir="rtl">الوثائق القانونية</span>
         </div>
       </div>
     </div>

@@ -18,19 +18,16 @@ const Index = () => {
   const [totalCases, setTotalCases] = useState(0);
   const [returnedCases, setReturnedCases] = useState(0);
   const [currentSearch, setCurrentSearch] = useState<string>('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
 
   const { loading, searchCases } = useApi();
 
-  const handleSearch = async (searchTerm: string, page: number = 1) => {
+  const handleSearch = async (searchTerm: string) => {
     setCurrentSearch(searchTerm);
-    setCurrentPage(page);
     
     const searchParams = {
       search: searchTerm || undefined,
-      offset: (page - 1) * 10,
-      limit: 10,
+      offset: 0,
+      limit: 20,
     };
 
     const response = await searchCases(searchParams);
@@ -39,12 +36,7 @@ const Index = () => {
       setResults(response.case_summaries);
       setTotalCases(response.total_cases);
       setReturnedCases(response.returned_cases);
-      setTotalPages(Math.ceil(response.total_cases / 10));
     }
-  };
-
-  const handlePageChange = (page: number) => {
-    handleSearch(currentSearch, page);
   };
 
   // Load initial data
@@ -68,9 +60,6 @@ const Index = () => {
           returnedCases={returnedCases}
           loading={loading}
           searchTerm={currentSearch}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
         />
       </div>
     </div>

@@ -2,10 +2,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { FileText, Eye } from 'lucide-react';
-
 interface CaseData {
   id: string;
   case_id: string;
@@ -13,33 +10,23 @@ interface CaseData {
   abstractive_summary: string;
   extractive_summary: string;
 }
-
 interface SearchResultsProps {
   results: CaseData[];
   totalCases: number;
   returnedCases: number;
   loading?: boolean;
   searchTerm?: string;
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
 }
-
 const SearchResults: React.FC<SearchResultsProps> = ({
   results,
   totalCases,
   returnedCases,
   loading = false,
-  searchTerm,
-  currentPage,
-  totalPages,
-  onPageChange
+  searchTerm
 }) => {
   if (loading) {
-    return (
-      <div className="space-y-6">
-        {[1, 2, 3].map(i => (
-          <Card key={i} className="p-6 shadow-card animate-pulse">
+    return <div className="space-y-6">
+        {[1, 2, 3].map(i => <Card key={i} className="p-6 shadow-card animate-pulse">
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <div className="h-4 bg-muted rounded w-32"></div>
@@ -49,28 +36,18 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               <div className="h-4 bg-muted rounded w-3/4"></div>
               <div className="h-4 bg-muted rounded w-1/2"></div>
             </div>
-          </Card>
-        ))}
-      </div>
-    );
+          </Card>)}
+      </div>;
   }
-
   if (results.length === 0) {
-    return (
-      <Card className="p-12 text-center shadow-card">
+    return <Card className="p-12 text-center shadow-card">
         <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
         <h3 className="text-xl font-semibold text-foreground mb-2" dir="rtl">
-          لا توجد نتائج
-        </h3>
-        <p className="text-muted-foreground" dir="rtl">
-          جرب البحث بكلمات مختلفة
-        </p>
-      </Card>
-    );
+      </h3>
+        
+      </Card>;
   }
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Results Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -86,20 +63,16 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       </div>
 
       {/* Results List */}
-      <Accordion type="multiple" className="space-y-4">
-        {results.map((case_item, index) => (
-          <AccordionItem 
-            key={case_item.id} 
-            value={case_item.id} 
-            className="border border-border/50 rounded-lg overflow-hidden hover:border-primary/20 transition-all duration-300 hover:shadow-legal"
-          >
-            <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-primary/5 transition-colors">
-              <div className="flex items-center justify-between w-full pr-4">
+      <div className="space-y-6">
+        {results.map((case_item, index) => <Card key={case_item.id} className="p-6 shadow-card hover:shadow-elegant transition-all duration-300 border-l-4 border-l-primary">
+            <div className="space-y-4">
+              {/* Case Header */}
+              <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
                   <div className="bg-primary/10 p-3 rounded-lg">
                     <FileText className="h-6 w-6 text-primary" />
                   </div>
-                  <div className="text-right">
+                  <div>
                     <h3 className="text-lg font-semibold text-foreground" dir="rtl">
                       قضية رقم #{case_item.case_id}
                     </h3>
@@ -111,92 +84,33 @@ const SearchResults: React.FC<SearchResultsProps> = ({
                     </div>
                   </div>
                 </div>
-              </div>
-            </AccordionTrigger>
-            
-            <AccordionContent className="px-6 pb-6">
-              <div className="space-y-4">
-                {/* Abstractive Summary */}
-                {case_item.abstractive_summary && (
-                  <div className="bg-accent-light p-4 rounded-lg border border-accent/20">
-                    <h4 className="font-medium text-accent-foreground mb-2" dir="rtl">الملخص التجريدي</h4>
-                    <p className="text-sm text-foreground leading-relaxed text-right" dir="rtl">
-                      {case_item.abstractive_summary}
-                    </p>
-                  </div>
-                )}
-
-                {/* Extractive Summary */}
-                {case_item.extractive_summary && (
-                  <div className="bg-secondary/50 p-4 rounded-lg border border-border">
-                    <h4 className="font-medium text-secondary-foreground mb-2" dir="rtl">النقاط الرئيسية</h4>
-                    <div className="text-sm text-foreground space-y-1" dir="rtl">
-                      {case_item.extractive_summary.split('\n').filter(line => line.trim()).map((point, idx) => (
-                        <p key={idx} className="leading-relaxed text-right">
-                          {point.replace(/^\*\s*/, '• ')}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="pt-2">
-                  <Button variant="outline" className="w-full">
-                    <Eye className="h-4 w-4 ml-2" />
-                    <span dir="rtl">عرض التفاصيل</span>
-                  </Button>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-      
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-8 flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              {currentPage > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious 
-                    onClick={() => onPageChange(currentPage - 1)}
-                    className="cursor-pointer"
-                  />
-                </PaginationItem>
-              )}
-              
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const pageNumber = Math.max(1, Math.min(currentPage - 2 + i, totalPages - 4 + i));
-                if (pageNumber > totalPages || pageNumber < 1) return null;
                 
-                return (
-                  <PaginationItem key={pageNumber}>
-                    <PaginationLink
-                      onClick={() => onPageChange(pageNumber)}
-                      isActive={currentPage === pageNumber}
-                      className="cursor-pointer"
-                    >
-                      {pageNumber}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
-              
-              {currentPage < totalPages && (
-                <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => onPageChange(currentPage + 1)}
-                    className="cursor-pointer"
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
-    </div>
-  );
-};
+                <Button variant="outline" size="sm">
+                  <Eye className="h-4 w-4 mr-2" />
+                  <span dir="rtl">عرض التفاصيل</span>
+                </Button>
+              </div>
 
+              {/* Abstractive Summary */}
+              {case_item.abstractive_summary && <div className="bg-accent-light p-4 rounded-lg border border-accent/20">
+                  <h4 className="font-medium text-accent-foreground mb-2" dir="rtl">الملخص التجريدي</h4>
+                  <p className="text-sm text-foreground leading-relaxed text-right" dir="rtl">
+                    {case_item.abstractive_summary}
+                  </p>
+                </div>}
+
+              {/* Extractive Summary */}
+              {case_item.extractive_summary && <div className="bg-secondary/50 p-4 rounded-lg border border-border">
+                  <h4 className="font-medium text-secondary-foreground mb-2" dir="rtl">النقاط الرئيسية</h4>
+                  <div className="text-sm text-foreground space-y-1" dir="rtl">
+                    {case_item.extractive_summary.split('\n').filter(line => line.trim()).map((point, idx) => <p key={idx} className="leading-relaxed text-right">
+                        {point.replace(/^\*\s*/, '• ')}
+                      </p>)}
+                  </div>
+                </div>}
+            </div>
+          </Card>)}
+      </div>
+    </div>;
+};
 export default SearchResults;

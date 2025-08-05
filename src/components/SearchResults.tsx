@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Eye } from 'lucide-react';
-
 interface CaseData {
   id: string;
   case_id: string;
@@ -11,7 +10,6 @@ interface CaseData {
   abstractive_summary: string;
   extractive_summary: string;
 }
-
 interface SearchResultsProps {
   results: CaseData[];
   totalCases: number;
@@ -19,7 +17,6 @@ interface SearchResultsProps {
   loading?: boolean;
   searchTerm?: string;
 }
-
 const SearchResults: React.FC<SearchResultsProps> = ({
   results,
   totalCases,
@@ -28,10 +25,8 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   searchTerm
 }) => {
   if (loading) {
-    return (
-      <div className="space-y-6">
-        {[1, 2, 3].map((i) => (
-          <Card key={i} className="p-6 shadow-card animate-pulse">
+    return <div className="space-y-6">
+        {[1, 2, 3].map(i => <Card key={i} className="p-6 shadow-card animate-pulse">
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                 <div className="h-4 bg-muted rounded w-32"></div>
@@ -41,29 +36,18 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               <div className="h-4 bg-muted rounded w-3/4"></div>
               <div className="h-4 bg-muted rounded w-1/2"></div>
             </div>
-          </Card>
-        ))}
-      </div>
-    );
+          </Card>)}
+      </div>;
   }
-
   if (results.length === 0) {
-    return (
-      <Card className="p-12 text-center shadow-card">
+    return <Card className="p-12 text-center shadow-card">
         <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-foreground mb-2" dir="rtl">لم يتم العثور على قضايا</h3>
-        <p className="text-muted-foreground" dir="rtl">
-          {searchTerm 
-            ? `لم يتم العثور على قضايا تطابق "${searchTerm}". جرب كلمات مختلفة أو عدل معايير البحث.`
-            : "ابدأ بإدخال مصطلح البحث للعثور على القضايا القانونية."
-          }
-        </p>
-      </Card>
-    );
+        <h3 className="text-xl font-semibold text-foreground mb-2" dir="rtl">
+      </h3>
+        
+      </Card>;
   }
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Results Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -80,8 +64,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
       {/* Results List */}
       <div className="space-y-6">
-        {results.map((case_item, index) => (
-          <Card key={case_item.id} className="p-6 shadow-card hover:shadow-elegant transition-all duration-300 border-l-4 border-l-primary">
+        {results.map((case_item, index) => <Card key={case_item.id} className="p-6 shadow-card hover:shadow-elegant transition-all duration-300 border-l-4 border-l-primary">
             <div className="space-y-4">
               {/* Case Header */}
               <div className="flex items-start justify-between">
@@ -109,34 +92,25 @@ const SearchResults: React.FC<SearchResultsProps> = ({
               </div>
 
               {/* Abstractive Summary */}
-              {case_item.abstractive_summary && (
-                <div className="bg-accent-light p-4 rounded-lg border border-accent/20">
+              {case_item.abstractive_summary && <div className="bg-accent-light p-4 rounded-lg border border-accent/20">
                   <h4 className="font-medium text-accent-foreground mb-2" dir="rtl">الملخص التجريدي</h4>
                   <p className="text-sm text-foreground leading-relaxed text-right" dir="rtl">
                     {case_item.abstractive_summary}
                   </p>
-                </div>
-              )}
+                </div>}
 
               {/* Extractive Summary */}
-              {case_item.extractive_summary && (
-                <div className="bg-secondary/50 p-4 rounded-lg border border-border">
+              {case_item.extractive_summary && <div className="bg-secondary/50 p-4 rounded-lg border border-border">
                   <h4 className="font-medium text-secondary-foreground mb-2" dir="rtl">النقاط الرئيسية</h4>
                   <div className="text-sm text-foreground space-y-1" dir="rtl">
-                    {case_item.extractive_summary.split('\n').filter(line => line.trim()).map((point, idx) => (
-                      <p key={idx} className="leading-relaxed text-right">
+                    {case_item.extractive_summary.split('\n').filter(line => line.trim()).map((point, idx) => <p key={idx} className="leading-relaxed text-right">
                         {point.replace(/^\*\s*/, '• ')}
-                      </p>
-                    ))}
+                      </p>)}
                   </div>
-                </div>
-              )}
+                </div>}
             </div>
-          </Card>
-        ))}
+          </Card>)}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SearchResults;

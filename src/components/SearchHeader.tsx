@@ -13,7 +13,7 @@ const SearchHeader: React.FC = () => {
       
       <h1 className="text-4xl font-bold text-foreground mb-4" dir="rtl">عرض ملخصات الوثائق - الحالة 1</h1>
       
-      <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6" dir="rtl">واجهة بحث مهنية لملخصات القضايا القانونية</p>
+      <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6" dir="rtl">الملخص الشامل اعتمادا على الوثائق</p>
       
       <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">

@@ -46,10 +46,10 @@ export const useApi = () => {
       if (params.search) {
         searchParams.append('search', params.search);
       }
-      if (params.offset) {
+      if (params.offset !== undefined) {
         searchParams.append('offset', String(params.offset));
       }
-      if (params.limit) {
+      if (params.limit !== undefined) {
         searchParams.append('limit', String(params.limit));
       }
       
